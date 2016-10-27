@@ -155,10 +155,11 @@ public class GameCore {
 		dataPanel.updateScore("" + correctAnswers);
 		switch(mode) {
 		case BOTH:
-			dataPanel.updateAccuracy(100.0*correctAnswers/2*currentNoteIndex + "%");
+			dataPanel.updateAccuracy(100.0*correctAnswers/(2*currentNoteIndex) + "%");
 			break;
 		default:
 			dataPanel.updateAccuracy(100.0*correctAnswers/currentNoteIndex + "%");
+			break;
 		}
 	}
 	
@@ -166,7 +167,9 @@ public class GameCore {
 		Timer timer = new Timer(50, new ActionListener() {
 			  @Override
 			  public void actionPerformed(ActionEvent arg0) {
-					updateStats();
+				  	notePanel.shouldDisplayBassGrades = false;
+				  	notePanel.shouldDisplayTrebbleGrades = false;
+				  	updateStats();
 					generateNote();
 			  }
 			});
@@ -175,48 +178,58 @@ public class GameCore {
 	}
 	
 	public void GradeBassNoteAndContinue(int note) {
-		if(note == bassNoteSource[currentNoteIndex]) {
-			correctAnswers++;
-		} else {
-			wrongAnswers++;
+		if(!currentBassNoteGraded) {
+		  	notePanel.shouldDisplayBassGrades = true;
+			if(note == bassNoteSource[currentNoteIndex]) {
+				notePanel.MarkBassNote(true);
+				correctAnswers++;
+			} else {
+				notePanel.MarkBassNote(false);
+				wrongAnswers++;
+			}
+			currentBassNoteGraded = true;
+			
+			switch(mode) {
+				case BASS:
+					currentNoteIndex++;
+					continueNotes();
+					break;
+				case BOTH:
+					if (currentTrebbleNoteGraded) {
+						currentNoteIndex++;
+						continueNotes();
+					}
+					break;
+				default:				
+			}
 		}
-		currentBassNoteGraded = true;
-		
-		switch(mode) {
-			case BASS:
+	}
+	
+	public void GradeTrebbleNoteAndContinue(int note) {
+		if(!currentTrebbleNoteGraded) {
+		  	notePanel.shouldDisplayTrebbleGrades = true;
+			if(note == trebbleNoteSource[currentNoteIndex]) {
+				notePanel.MarkTrebbleNote(true);
+				correctAnswers++;
+			} else {
+				notePanel.MarkTrebbleNote(false);
+				wrongAnswers++;
+			}
+			currentTrebbleNoteGraded = true;
+			
+			switch(mode) {
+			case TREBBLE:
 				currentNoteIndex++;
 				continueNotes();
 				break;
 			case BOTH:
-				if (currentTrebbleNoteGraded) {
+				if (currentBassNoteGraded) {
 					currentNoteIndex++;
 					continueNotes();
 				}
 				break;
 			default:				
-		}
-	}
-	
-	public void GradeTrebbleNoteAndContinue(int note) {
-		if(note == trebbleNoteSource[currentNoteIndex]) {
-			correctAnswers++;
-		} else {
-			wrongAnswers++;
-		}
-		currentTrebbleNoteGraded = true;
-		
-		switch(mode) {
-		case TREBBLE:
-			currentNoteIndex++;
-			continueNotes();
-			break;
-		case BOTH:
-			if (currentBassNoteGraded) {
-				currentNoteIndex++;
-				continueNotes();
 			}
-			break;
-		default:				
 		}
 	}
 	
