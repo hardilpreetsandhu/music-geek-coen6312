@@ -24,6 +24,7 @@ public class GameCore {
 	
 	private DataPanel dataPanel;
 	private StavePanel notePanel;
+	private KeyboardPanel keyPanel;
 	
 	private int currentNoteIndex = -1;
 	private boolean currentBassNoteGraded = false;
@@ -31,24 +32,33 @@ public class GameCore {
 	private int[] bassNoteSource = null; 
 	private int[] trebbleNoteSource = null; 
 	
-	public void Start(StavePanel aPanel, DataPanel bPanel) {
-		notePanel = aPanel;
-		switch(mode) {
-		case BASS:
-			notePanel.shouldBass = true;
-			notePanel.shouldTrebble = false;
-			break;
-		case TREBBLE:
-			notePanel.shouldBass = false;
-			notePanel.shouldTrebble = true;
-			break;
-		default:
-			notePanel.shouldBass = true;
-			notePanel.shouldTrebble = true;
-			break;
-		}
-		
+	public void Reset(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel) {
 		dataPanel = bPanel;
+		
+		notePanel = aPanel;
+		notePanel.shouldBass = doesBass;
+		notePanel.shouldTrebble = doesTrebble;
+		
+		keyPanel = cPanel;
+		keyPanel.shouldBass = doesBass;
+		keyPanel.shouldTrebble = doesTrebble;
+		
+		if (timer != null) {
+			timer.stop();
+			timer = null;
+		}
+		currentNoteIndex = -1;
+		currentBassNoteGraded = false;
+		currentTrebbleNoteGraded = false;
+	}
+
+	public GameCore(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel) {
+		notePanel = aPanel;
+		dataPanel = bPanel;
+		keyPanel = cPanel;
+	}
+	
+	public void Start() {
 		if(doesTime) {
 			ActionListener action = new ActionListener() {   
 		        @Override
@@ -74,6 +84,8 @@ public class GameCore {
 	}
 	
 	private void generateNote() {
+		currentBassNoteGraded = false;
+		currentTrebbleNoteGraded = false;
 		if(doesBass) {
 			if (bassNoteSource == null) {
 				doesFile = false;

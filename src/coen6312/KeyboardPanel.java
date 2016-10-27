@@ -6,6 +6,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.awt.*; 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.*; 
 
 import javax.imageio.*; 
@@ -34,14 +36,30 @@ public class KeyboardPanel extends JPanel {
 			     put("'", 6);
 			}};
 			
+	private Timer timer;
+			
 	public static BufferedImage image;
 	public int currentBassOctave = 0;
 	public int currentTrebbleOctave = 0;
 	public char currentBassKey = 0;	
 	public char currentTrebbleKey = 0;	
 	
+	public boolean shouldBass = true;
+	public boolean shouldTrebble = false;
+	
 	public KeyboardPanel () { 
 		super(); 
+		ActionListener action = new ActionListener() {   
+	        @Override
+	        public void actionPerformed(ActionEvent event) {
+	           timer.stop();
+	           repaint();
+	        }
+	    };
+	    
+		timer = new Timer(0, action);
+	    timer.setInitialDelay(800);
+
         this.setBackground(Color.ORANGE);
 		try {                
 			image = ImageIO.read(new File("./src/Keyboard.png")); 
@@ -57,19 +75,25 @@ public class KeyboardPanel extends JPanel {
 		int fileNum = -1;
 		if(t != null) {
 			String fileToPlay = "./sounds/";
-			if(c=='q' || c=='w' || c=='e' || c=='r' || c=='t' || c=='g' || c=='h') {
+			if(shouldBass && (c=='q' || c=='w' || c=='e' || c=='r' || c=='t' || c=='g' || c=='h')) {
 				currentBassKey = c;
 				fileNum = currentBassOctave*7 + t;
 				fileToPlay += "b" + fileNum + ".wav";
-			} else if(c=='\'' || c==';' || c=='l' || c=='k' || c=='j' || c=='n' || c=='b') {
+				playAudioFile(fileToPlay);
+			} else if(shouldTrebble && (c=='\'' || c==';' || c=='l' || c=='k' || c=='j' || c=='n' || c=='b')) {
 				currentTrebbleKey = c;
 				fileNum = currentTrebbleOctave*7 + t;
 				fileToPlay += "t" + fileNum + ".wav";
+				playAudioFile(fileToPlay);
 				fileNum += 100;
 			} 
-			
-		    try {	    	
-		    	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(fileToPlay));
+		}
+		return fileNum;
+	}
+
+	private void playAudioFile(String path) {
+		 try {	    	
+		    	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(path));
 		    	Clip clip = AudioSystem.getClip();
 		    	clip.open(audioInputStream);
 		    	clip.start( );
@@ -78,10 +102,8 @@ public class KeyboardPanel extends JPanel {
 		    	System.out.println("Problem playing audio file: " + ex);
 		    }	    
 			repaint();
-		}
-		return fileNum;
 	}
-
+	
 	public void paintComponent(Graphics g) { 
 		g.drawImage(image, 0, 0, null); 
 		g.setColor(Color.BLACK);
@@ -203,5 +225,7 @@ public class KeyboardPanel extends JPanel {
         	g.fillOval(circleX, 70, 12, 12);
         	currentTrebbleKey = 0;
         }
+        
+        timer.start();
 	} 
 }

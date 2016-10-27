@@ -50,13 +50,13 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 				      @Override
 				      public boolean dispatchKeyEvent(KeyEvent e) {
 				    	  int id = e.getID();
-				          if (id == KeyEvent.KEY_TYPED) {
+				          if (window.game != null && window.kPanel != null && id == KeyEvent.KEY_TYPED) {
 				        	  int notePressed = window.kPanel.ProcessKeyPress(e.getKeyChar());
 				        	  if (notePressed >= 0) {
 				        		  if(notePressed >= 100) {
-				        			  window.game.GradeTrebbleNoteAndContinue(notePressed-100);
+				        			window.game.GradeTrebbleNoteAndContinue(notePressed-100);
 				        		  } else {
-				        			  window.game.GradeBassNoteAndContinue(notePressed);
+					        		window.game.GradeBassNoteAndContinue(notePressed);
 				        		  }
 				        	  }
 				          }
@@ -74,14 +74,14 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
         	System.exit(0);
         } else if (source instanceof JRadioButtonMenuItem) {
         	if (actionName.contains("trebble")) {
-            	this.restartGame();
         		game.setMode(GameMode.TREBBLE);
+        		this.restartGame();
             } else if (actionName.contains("bass")) {
-            	this.restartGame();
         		game.setMode(GameMode.BASS);
-            } else if (actionName.contains("both")) {
             	this.restartGame();
+            } else if (actionName.contains("both")) {
         		game.setMode(GameMode.BOTH);
+            	this.restartGame();
             } 
         } else if (actionName.contains("view")) {
         	File file = new File("./src/Scoreboard.txt");
@@ -227,13 +227,21 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 	
 	void restartGame() {
 		this.getContentPane().removeAll();
-		this.restartUI();
+		this.invalidate();
 		
-		game = new GameCore();
+		this.resetUI();
+		this.validate();
+		
+		if (game != null) {
+			game.Reset(stavePanel,dataPanel,kPanel);
+		} else {
+			game = new GameCore(stavePanel,dataPanel,kPanel);
+		}
+
 		startButton.addActionListener (new ActionListener() {
       	  public void actionPerformed(ActionEvent e) {
       		  if(startButton.getText().toLowerCase().contains("start")) {
-      			  game.Start(stavePanel, dataPanel);
+      			  game.Start();
       			  startButton.setText("Stop");
       		  } else {
       			  game.Stop();
@@ -241,6 +249,8 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
       		  }      		  
       	  }
 		});
+		
+		this.repaint();
 	}
 	
 	void initializeUI() {	
@@ -253,7 +263,7 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
         this.setJMenuBar(buildMenuBar()); 
 	}
 	
-	void restartUI() {
+	void resetUI() {
 	    //Where all GUI elements are created:				
         dataPanel = new DataPanel(); 
         dataPanel.setPreferredSize(new Dimension(700, 40));
