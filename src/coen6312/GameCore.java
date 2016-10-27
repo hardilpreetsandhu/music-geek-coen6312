@@ -229,6 +229,7 @@ public class GameCore {
 	}
 	
 	public void setMode(GameMode m) {
+		mode = m;
 		switch(m) {
 			case BASS:
 				doesBass = true;

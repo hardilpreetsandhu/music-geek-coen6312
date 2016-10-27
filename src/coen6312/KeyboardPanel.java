@@ -60,7 +60,6 @@ public class KeyboardPanel extends JPanel {
 		timer = new Timer(0, action);
 	    timer.setInitialDelay(800);
 
-        this.setBackground(Color.ORANGE);
 		try {                
 			image = ImageIO.read(new File("./src/Keyboard.png")); 
 		} 
