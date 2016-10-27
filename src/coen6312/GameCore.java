@@ -47,6 +47,9 @@ public class GameCore {
 		keyPanel = cPanel;
 		keyPanel.shouldBass = doesBass;
 		keyPanel.shouldTrebble = doesTrebble;
+		keyPanel.songTitle = null;
+		bassNoteSource = null; 
+		trebbleNoteSource = null;
 		
 		if (timer != null) {
 			timer.stop();
@@ -243,10 +246,94 @@ public class GameCore {
 				while ((character = fis.read()) != -1) {
 						notes += (char)character;   
 				}
-				System.out.println("Got all the notes: " + notes);
 				doesFile = true;
 				//Parse file and fill up bass and trebbleNoteSource:
+				String[] lines = notes.split("\n");
+				bassNoteSource = new int[120]; 
+				trebbleNoteSource = new int[120]; 
+				int insertedBassNotes = 0;
+				int insertedTrebbleNotes = 0;
+				for(int i = 0; i < lines.length; i++) {
+					if (i==0) {
+						String[] titleSplit = lines[i].split(":");
+						keyPanel.songTitle = titleSplit[1];
+					} else {
+						String[] lineSplit = lines[i].split(":");
+						String header = lineSplit[0].toLowerCase();
+						if(header.equals("bass")) {
+							String[] bassNotes = lineSplit[1].split("\\s+");
+							//Fill up the notes:
+							for(int j=0 ; j <bassNotes.length && insertedBassNotes < 120; j++) {
+								switch(bassNotes[j].toLowerCase()) {
+								case "la":
+									bassNoteSource[insertedBassNotes++] = 0;
+									break;
+								case "si":
+									bassNoteSource[insertedBassNotes++] = 1;
+									break;
+								case "do":
+									bassNoteSource[insertedBassNotes++] = 2;
+									break;
+								case "re":
+									bassNoteSource[insertedBassNotes++] = 3;
+									break;
+								case "mi":
+									bassNoteSource[insertedBassNotes++] = 4;
+									break;
+								case "fa":
+									bassNoteSource[insertedBassNotes++] = 5;
+									break;
+								case "sol":
+									bassNoteSource[insertedBassNotes++] = 6;
+									break;
+								default:
+									System.out.println("Wierd note found: " + bassNotes[j]);
+									break;
+								}
+							}
+						} else if(header.equals("trebble")) {
+							String[] trebbleNotes = lineSplit[1].split("\\s+");
+							//Fill up the notes:
+							for(int j=0 ; j <trebbleNotes.length && insertedTrebbleNotes < 120; j++) {
+								switch(trebbleNotes[j].toLowerCase()) {
+								case "fa":
+									trebbleNoteSource[insertedTrebbleNotes++] = 0;
+									break;
+								case "sol":
+									trebbleNoteSource[insertedTrebbleNotes++] = 1;
+									break;
+								case "la":
+									trebbleNoteSource[insertedTrebbleNotes++] = 2;
+									break;
+								case "si":
+									trebbleNoteSource[insertedTrebbleNotes++] = 3;
+									break;
+								case "do":
+									trebbleNoteSource[insertedTrebbleNotes++] = 4;
+									break;
+								case "re":
+									trebbleNoteSource[insertedTrebbleNotes++] = 5;
+									break;
+								case "mi":
+									trebbleNoteSource[insertedTrebbleNotes++] = 6;
+									break;
+								default:
+									System.out.println("Wierd note found: " + trebbleNotes[j]);
+									break;
+								}
+							}
+						} else {
+							System.out.println("Unknown line with code: " + lineSplit[0]);
+						}
+					}					
+				}
 				
+				for(int r = insertedBassNotes; r<120; r++) {
+					bassNoteSource[r] = bassNoteSource[r-insertedBassNotes];
+				}
+				for(int r = insertedTrebbleNotes; r<120; r++) {
+					trebbleNoteSource[r] = trebbleNoteSource[r-insertedBassNotes];
+				}
     		} catch (IOException e1) {
     			e1.printStackTrace();
     		} finally {

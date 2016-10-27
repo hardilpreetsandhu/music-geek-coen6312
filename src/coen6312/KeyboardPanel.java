@@ -49,6 +49,8 @@ public class KeyboardPanel extends JPanel {
 	public boolean shouldBass = true;
 	public boolean shouldTrebble = false;
 	
+	public String songTitle = null;
+	
 	public KeyboardPanel () { 
 		super(); 
 		ActionListener action = new ActionListener() {   
@@ -116,6 +118,12 @@ public class KeyboardPanel extends JPanel {
 		}
 		
 		g.setColor(Color.BLACK);
+		
+		if(songTitle != null) {
+			g.setFont(new Font("Arial Black", Font.ITALIC, 18));
+			g.drawString(songTitle, 200, 140);
+		}
+		
         g.setFont(new Font("Arial Black", Font.BOLD, 11));
         
         //Draw the Bass guide letters:
