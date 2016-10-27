@@ -38,7 +38,9 @@ public class KeyboardPanel extends JPanel {
 			
 	private Timer timer;
 			
-	public static BufferedImage image;
+	public static BufferedImage keyboardImage;
+	public static BufferedImage maskImage;
+	
 	public int currentBassOctave = 0;
 	public int currentTrebbleOctave = 0;
 	public char currentBassKey = 0;	
@@ -60,8 +62,9 @@ public class KeyboardPanel extends JPanel {
 		timer = new Timer(0, action);
 	    timer.setInitialDelay(800);
 
-		try {                
-			image = ImageIO.read(new File("./src/Keyboard.png")); 
+		try {
+			keyboardImage = ImageIO.read(new File("./src/Keyboard.png")); 
+			maskImage = ImageIO.read(new File("./src/Mask.png")); 
 		} 
 		catch (IOException e) { 
 			//Not handled.
@@ -104,7 +107,14 @@ public class KeyboardPanel extends JPanel {
 	}
 	
 	public void paintComponent(Graphics g) { 
-		g.drawImage(image, 0, 0, null); 
+		g.drawImage(keyboardImage, 0, 0, null); 
+		if(shouldBass) {
+			g.drawImage(maskImage, currentBassOctave*105, 0, null);
+		}
+		if(shouldTrebble) {
+			g.drawImage(maskImage, 595 - (2-currentTrebbleOctave)*105, 0, null);
+		}
+		
 		g.setColor(Color.BLACK);
         g.setFont(new Font("Arial Black", Font.BOLD, 11));
         

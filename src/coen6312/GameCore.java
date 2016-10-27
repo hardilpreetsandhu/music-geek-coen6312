@@ -100,14 +100,18 @@ public class GameCore {
 				doesFile = false;
 				fillUpRandomBassNotes();
 			} 
-			notePanel.InsertBassNote(bassNoteSource[currentNoteIndex]);
+			int bassNote = bassNoteSource[currentNoteIndex];
+			keyPanel.currentBassOctave = bassNote/7;
+			notePanel.InsertBassNote(bassNote);
 		} 
 		if(doesTrebble) {
 			if (trebbleNoteSource == null) {
 				doesFile = false;
 				fillUpRandomTrebbleNotes();
 			} 
-			notePanel.InsertTrebbleNote(trebbleNoteSource[currentNoteIndex]);
+			int trebbleNote = trebbleNoteSource[currentNoteIndex];
+			keyPanel.currentTrebbleOctave = trebbleNote/7;
+			notePanel.InsertTrebbleNote(trebbleNote);
 		} 
 	}
 	
@@ -158,6 +162,18 @@ public class GameCore {
 		}
 	}
 	
+	private void continueNotes() {
+		Timer timer = new Timer(50, new ActionListener() {
+			  @Override
+			  public void actionPerformed(ActionEvent arg0) {
+					updateStats();
+					generateNote();
+			  }
+			});
+		timer.setRepeats(false); // Only execute once
+		timer.start();
+	}
+	
 	public void GradeBassNoteAndContinue(int note) {
 		if(note == bassNoteSource[currentNoteIndex]) {
 			correctAnswers++;
@@ -169,14 +185,12 @@ public class GameCore {
 		switch(mode) {
 			case BASS:
 				currentNoteIndex++;
-				updateStats();
-				generateNote();
+				continueNotes();
 				break;
 			case BOTH:
 				if (currentTrebbleNoteGraded) {
 					currentNoteIndex++;
-					updateStats();
-					generateNote();
+					continueNotes();
 				}
 				break;
 			default:				
@@ -194,14 +208,12 @@ public class GameCore {
 		switch(mode) {
 		case TREBBLE:
 			currentNoteIndex++;
-			updateStats();
-			generateNote();
+			continueNotes();
 			break;
 		case BOTH:
 			if (currentBassNoteGraded) {
 				currentNoteIndex++;
-				updateStats();
-				generateNote();
+				continueNotes();
 			}
 			break;
 		default:				
