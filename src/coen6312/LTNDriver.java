@@ -50,7 +50,7 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 				      @Override
 				      public boolean dispatchKeyEvent(KeyEvent e) {
 				    	  int id = e.getID();
-				          if (window.game != null && window.kPanel != null && id == KeyEvent.KEY_TYPED) {
+				          if (window.game != null && !window.game.isPaused() && window.kPanel != null && id == KeyEvent.KEY_TYPED) {
 				        	  int notePressed = window.kPanel.ProcessKeyPress(e.getKeyChar());
 				        	  if (notePressed >= 0) {
 				        		  if(notePressed >= 100) {
@@ -212,7 +212,7 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
         if (actionName.contains("time")) {
         	if (e.getStateChange() == ItemEvent.SELECTED) {
         		this.restartGame();
-        		game.setupTimedGame(2);
+        		game.setupTimedGame(60);
             } else {
         		this.restartGame();
         		game.setupTimedGame(0);

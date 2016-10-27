@@ -27,10 +27,15 @@ public class GameCore {
 	private KeyboardPanel keyPanel;
 	
 	private int currentNoteIndex = -1;
+	private int correctAnswers = 0;
+	private int wrongAnswers = 0;
+	
 	private boolean currentBassNoteGraded = false;
 	private boolean currentTrebbleNoteGraded = false;
 	private int[] bassNoteSource = null; 
 	private int[] trebbleNoteSource = null; 
+	
+	private boolean paused = true;
 	
 	public void Reset(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel) {
 		dataPanel = bPanel;
@@ -46,10 +51,14 @@ public class GameCore {
 		if (timer != null) {
 			timer.stop();
 			timer = null;
+			timeLeft = initialTimeValue;
 		}
 		currentNoteIndex = -1;
+		correctAnswers = 0;
+		wrongAnswers = 0;
 		currentBassNoteGraded = false;
 		currentTrebbleNoteGraded = false;
+		paused = true;
 	}
 
 	public GameCore(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel) {
@@ -59,12 +68,12 @@ public class GameCore {
 	}
 	
 	public void Start() {
+		paused = false;
 		if(doesTime) {
 			ActionListener action = new ActionListener() {   
 		        @Override
 		        public void actionPerformed(ActionEvent event) {
 		            if(timeLeft == 0) {
-		                timer.stop();
 		                dataPanel.updateTime("Timed out!");
 		                Stop();
 		            }
@@ -77,7 +86,7 @@ public class GameCore {
 		    
 			timer = new Timer(delay, action);
 		    timer.setInitialDelay(0);
-		    timer.start();				
+		    timer.start();
 		}
 		currentNoteIndex = 0;
 		generateNote();
@@ -116,7 +125,10 @@ public class GameCore {
 	}
 	
 	public void Stop() {
-		
+		if(timer != null) {
+			timer.stop();
+		}
+		paused = true;
 	}
 	
 	public boolean isBass() {
@@ -131,25 +143,39 @@ public class GameCore {
 	public boolean isRandom() {
 		return !doesFile;
 	}
+	public boolean isPaused() {
+		return paused;
+	}
+	
+	private void updateStats() {
+		dataPanel.updateScore("" + correctAnswers);
+		switch(mode) {
+		case BOTH:
+			dataPanel.updateAccuracy(100.0*correctAnswers/2*currentNoteIndex + "%");
+			break;
+		default:
+			dataPanel.updateAccuracy(100.0*correctAnswers/currentNoteIndex + "%");
+		}
+	}
 	
 	public void GradeBassNoteAndContinue(int note) {
 		if(note == bassNoteSource[currentNoteIndex]) {
-			//Correct!
-			System.out.println("CORRECT!");
+			correctAnswers++;
 		} else {
-			//Incorrect!
-			System.out.println("WRONG!");
+			wrongAnswers++;
 		}
 		currentBassNoteGraded = true;
 		
 		switch(mode) {
 			case BASS:
 				currentNoteIndex++;
+				updateStats();
 				generateNote();
 				break;
 			case BOTH:
 				if (currentTrebbleNoteGraded) {
 					currentNoteIndex++;
+					updateStats();
 					generateNote();
 				}
 				break;
@@ -159,22 +185,22 @@ public class GameCore {
 	
 	public void GradeTrebbleNoteAndContinue(int note) {
 		if(note == trebbleNoteSource[currentNoteIndex]) {
-			//Correct!
-			System.out.println("CORRECT!");
+			correctAnswers++;
 		} else {
-			//Incorrect!
-			System.out.println("WRONG!");
+			wrongAnswers++;
 		}
 		currentTrebbleNoteGraded = true;
 		
 		switch(mode) {
 		case TREBBLE:
 			currentNoteIndex++;
+			updateStats();
 			generateNote();
 			break;
 		case BOTH:
 			if (currentBassNoteGraded) {
 				currentNoteIndex++;
+				updateStats();
 				generateNote();
 			}
 			break;
