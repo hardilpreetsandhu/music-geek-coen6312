@@ -18,8 +18,9 @@ import javax.sound.sampled.Clip;
     
 public class KeyboardPanel extends JPanel { 
 	private static final long serialVersionUID = 1L;
-	private static final Map<String, Integer> keyWeights = new HashMap<String, Integer>()
-			{{
+	private static final Map<String, Integer> keyWeights = new HashMap<String, Integer>() {	
+			private static final long serialVersionUID = 1L;
+			{
 			     put("q", 0);
 			     put("w", 1);
 			     put("e", 2);
