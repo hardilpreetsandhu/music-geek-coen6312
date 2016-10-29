@@ -28,7 +28,7 @@ public class GameCore {
 	
 	private int currentNoteIndex = -1;
 	private int correctAnswers = 0;
-	private int wrongAnswers = 0;
+	//private int wrongAnswers = 0;
 	
 	private boolean currentBassNoteGraded = false;
 	private boolean currentTrebbleNoteGraded = false;
@@ -58,7 +58,7 @@ public class GameCore {
 		}
 		currentNoteIndex = -1;
 		correctAnswers = 0;
-		wrongAnswers = 0;
+		//wrongAnswers = 0;
 		currentBassNoteGraded = false;
 		currentTrebbleNoteGraded = false;
 		paused = true;
@@ -188,7 +188,7 @@ public class GameCore {
 				correctAnswers++;
 			} else {
 				notePanel.MarkBassNote(false);
-				wrongAnswers++;
+				//wrongAnswers++;
 			}
 			currentBassNoteGraded = true;
 			
@@ -216,7 +216,7 @@ public class GameCore {
 				correctAnswers++;
 			} else {
 				notePanel.MarkTrebbleNote(false);
-				wrongAnswers++;
+				//wrongAnswers++;
 			}
 			currentTrebbleNoteGraded = true;
 			

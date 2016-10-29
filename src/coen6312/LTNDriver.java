@@ -1,13 +1,11 @@
 package coen6312;
 
 import java.util.*;
-import java.lang.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
 import javax.swing.*;
-import javax.swing.filechooser.*;
 
 
 public class LTNDriver extends JFrame implements ActionListener, ItemListener {
@@ -20,8 +18,9 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 	private GameCore game;
 	
 	private static final long serialVersionUID = 1L;
-	private static final Map<String, String[]> menuOptions = new LinkedHashMap<String, String[]>()
-			{{
+	private static final Map<String, String[]> menuOptions = new LinkedHashMap<String, String[]>() {
+				private static final long serialVersionUID = 1L;
+			{
 			     put("File", new String[] {"Load song", "Exit"});
 			     put("ScoreBoards", new String[] {"View all", "Reset scores"});
 			     
