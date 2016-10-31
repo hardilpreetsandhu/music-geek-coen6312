@@ -36,8 +36,11 @@ public class GameCore {
 	private int[] trebbleNoteSource = null; 
 	
 	private boolean paused = true;
+	private LTNDriver hostFrame = null;
 	
-	public void Reset(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel) {
+	public void Reset(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel, LTNDriver aFrame) {
+		hostFrame = aFrame;
+		
 		dataPanel = bPanel;
 		
 		notePanel = aPanel;
@@ -64,7 +67,8 @@ public class GameCore {
 		paused = true;
 	}
 
-	public GameCore(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel) {
+	public GameCore(StavePanel aPanel, DataPanel bPanel, KeyboardPanel cPanel, LTNDriver aFrame) {
+		hostFrame = aFrame;
 		notePanel = aPanel;
 		dataPanel = bPanel;
 		keyPanel = cPanel;
@@ -72,6 +76,8 @@ public class GameCore {
 	
 	public void Start() {
 		paused = false;
+		timeLeft = initialTimeValue;
+		dataPanel.updateTime(currentTimeStamp());
 		if(doesTime) {
 			ActionListener action = new ActionListener() {   
 		        @Override
@@ -136,6 +142,7 @@ public class GameCore {
 			timer.stop();
 		}
 		paused = true;
+		hostFrame.showScoreDialog(correctAnswers);
 	}
 	
 	public boolean isBass() {

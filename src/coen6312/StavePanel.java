@@ -39,10 +39,12 @@ public class StavePanel extends JPanel {
 	}
 	public void MarkBassNote(boolean isCorrect) {
 		currentBassGrade = isCorrect;
+		currentBassNote = -1;
 		repaint();
 	}
 	public void MarkTrebbleNote(boolean isCorrect) {
 		currentTrebbleGrade = isCorrect;
+		currentTrebbleNote = -1;
 		repaint();
 	}
 	
@@ -85,11 +87,11 @@ public class StavePanel extends JPanel {
 		}
 		if(currentBassNote > -1) {
 			g.drawImage(noteImage, 196, 165 - currentBassNote/2 - currentBassNote*5, null);
-			currentBassNote = -1;
+			//currentBassNote = -1;
 		}
 		if(currentTrebbleNote > -1) {
 			g.drawImage(noteImage, 506, 165 - currentTrebbleNote/2 - currentTrebbleNote*5, null);
-			currentTrebbleNote = -1;
+			//currentTrebbleNote = -1;
 		}
 	} 
 }

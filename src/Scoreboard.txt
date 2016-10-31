@@ -1,1 +1,11 @@
 Name::Scores
+Esteban::10
+Jesus::12
+Pedro::4
+Pedra::7
+Gustav::23
+Michael::3
+Uno::3
+Dos::67
+JEG::2
+Gen::2

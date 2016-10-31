@@ -17,6 +17,9 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 	
 	private GameCore game;
 	
+	private int currentMinimumScore = 0;
+	private int currentNumberOfScores = 0;
+	
 	private static final long serialVersionUID = 1L;
 	private static final Map<String, String[]> menuOptions = new LinkedHashMap<String, String[]>() {
 				private static final long serialVersionUID = 1L;
@@ -31,7 +34,41 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 			     put("Help", new String[] {"Music Theory", "About"});
 			}};
     
-			
+	
+	public void showScoreDialog(int score) {
+		//Only games under time record scores:
+		if(game.isTime()) {
+			if(currentNumberOfScores < 10) {
+				String name = JOptionPane.showInputDialog(
+				        this, 
+				        "You've set a new record (" + score + "). Please type in your name...", 
+				        "New record!", 
+				        JOptionPane.QUESTION_MESSAGE
+				    );
+				writeStringToFile("\n" + name + "::" + score,"./src/Scoreboard.txt", true);
+			} else if (score > currentMinimumScore) {
+			    String name = JOptionPane.showInputDialog(
+				        this, 
+				        "You've set a new record (" + score + "). Please type in your name...", 
+				        "New record!", 
+				        JOptionPane.QUESTION_MESSAGE
+				    );	
+				//Must remove the lowest score and replace with this one!
+				String wholeFile = readFile("./src/Scoreboard.txt");
+				String[] lines = wholeFile.split("\n");
+				for(int i = 1 ; i < lines.length ; i++) {
+					int num = Integer.parseInt(lines[i].split("::")[1]);
+					if(num == currentMinimumScore) {
+						lines[i] = name + "::" + score;
+						break;
+					}
+				}
+				String finalFile = String.join("\n", lines);
+				writeStringToFile(finalFile,"./src/Scoreboard.txt", false);
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -66,6 +103,61 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 		});
 	}
 	
+	private String readFile(String Path) {
+		File file = new File(Path);
+		FileInputStream fis = null;
+		String resp = null;
+		try {
+			fis = new FileInputStream(file);
+			resp = "";
+			int character;
+			while ((character = fis.read()) != -1) {
+				resp += (char)character;   
+			}			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} 
+		
+		try {
+			if (fis != null) {
+				fis.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return resp;
+	}
+	
+	private void writeStringToFile(String content, String f, boolean append) {
+    	FileOutputStream fop = null;
+		File file;
+		try {
+			file = new File(f);
+			fop = new FileOutputStream(file, append);
+
+ 			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			byte[] contentInBytes = content.getBytes();
+			fop.write(contentInBytes);
+			fop.flush();
+			fop.close();
+			System.out.println("File " + f + ( append ? "updated!" : "reseted" ) );
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			try {
+				if (fop != null) {
+					fop.close();
+				}
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			}
+		}	
+	}
+	
 	public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem)(e.getSource());
         String actionName = source.getText().toLowerCase();
@@ -83,65 +175,17 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
             	this.restartGame();
             } 
         } else if (actionName.contains("view")) {
-        	File file = new File("./src/Scoreboard.txt");
-    		FileInputStream fis = null;
-    		try {
-    			fis = new FileInputStream(file);
-				String scores = "";
-    			if (fis.available() > 12) {
-					int character;
-					while ((character = fis.read()) != -1) {
-						if (character == ':') {
-							scores += ' ';
-						} else {
-							scores += (char)character;   
-						}
-					}
-    			} else {
-    				scores = "No scores currently found!\nPlay some more :)";
-    			}   
-				JOptionPane.showMessageDialog(this,
-	        		    scores,
-	        		    "Learn the Notes Scoreboard",
-	        		    JOptionPane.PLAIN_MESSAGE);
-    		} catch (IOException e1) {
-    			e1.printStackTrace();
-    		} finally {
-    			try {
-    				if (fis != null)
-    					fis.close();
-    			} catch (IOException ex) {
-    				ex.printStackTrace();
-    			}
-    		}
+        	String scoreFile = readFile("./src/Scoreboard.txt");
+        	String finalMessage = scoreFile.replace(':', ' ');
+        	if(finalMessage.length()<13) {
+        		finalMessage = "No scores currently found!\nPlay some more :)";
+        	}
+    		JOptionPane.showMessageDialog(this,
+        		    finalMessage,
+        		    "Learn the Notes Scoreboard",
+        		    JOptionPane.PLAIN_MESSAGE);     	
         } else if (actionName.contains("reset")) {
-        	FileOutputStream fop = null;
-    		File file;
-    		String content = "Name::Scores";
-    		try {
-    			file = new File("./src/Scoreboard.txt");
-    			fop = new FileOutputStream(file);
-
-     			if (!file.exists()) {
-    				file.createNewFile();
-    			}
-
-    			byte[] contentInBytes = content.getBytes();
-    			fop.write(contentInBytes);
-    			fop.flush();
-    			fop.close();
-    			System.out.println("Scoreboard created!");
-    		} catch (IOException e1) {
-    			e1.printStackTrace();
-    		} finally {
-    			try {
-    				if (fop != null) {
-    					fop.close();
-    				}
-    			} catch (IOException e2) {
-    				e2.printStackTrace();
-    			}
-    		}
+        	writeStringToFile("Name::Scores","./src/Scoreboard.txt",false);
         } else if (actionName.contains("music")) {
         	
         	JPanel pane = new JPanel(); 
@@ -211,7 +255,7 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
         if (actionName.contains("time")) {
         	if (e.getStateChange() == ItemEvent.SELECTED) {
         		this.restartGame();
-        		game.setupTimedGame(60);
+        		game.setupTimedGame(10);
             } else {
         		this.restartGame();
         		game.setupTimedGame(0);
@@ -219,9 +263,28 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
         }
     }
     
+    public void findAndStoreMinimumScore() {
+    	String scoreFile = readFile("./src/Scoreboard.txt");
+    	String[] lines = scoreFile.split("\n");
+		int min = Integer.MAX_VALUE;
+		for(int i = 1; i < lines.length; i++) {
+			currentNumberOfScores++;
+			int tmp = Integer.parseInt(lines[i].split("::")[1]);
+			if( tmp < min ) {
+				min = tmp;
+			}
+		}		
+		if( min == Integer.MAX_VALUE) {
+			currentMinimumScore = 0;
+		} else {
+			currentMinimumScore = min;	
+		}
+    }
+    
 	public LTNDriver() {	
 		 this.initializeUI();
 		 this.restartGame();
+		 this.findAndStoreMinimumScore();
 	}
 	
 	void restartGame() {
@@ -232,9 +295,9 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
 		this.validate();
 		
 		if (game != null) {
-			game.Reset(stavePanel,dataPanel,kPanel);
+			game.Reset(stavePanel,dataPanel,kPanel,this);
 		} else {
-			game = new GameCore(stavePanel,dataPanel,kPanel);
+			game = new GameCore(stavePanel,dataPanel,kPanel,this);
 		}
 
 		startButton.addActionListener (new ActionListener() {
