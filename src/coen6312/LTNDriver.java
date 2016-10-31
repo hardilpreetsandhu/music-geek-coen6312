@@ -255,7 +255,7 @@ public class LTNDriver extends JFrame implements ActionListener, ItemListener {
         if (actionName.contains("time")) {
         	if (e.getStateChange() == ItemEvent.SELECTED) {
         		this.restartGame();
-        		game.setupTimedGame(10);
+        		game.setupTimedGame(60);
             } else {
         		this.restartGame();
         		game.setupTimedGame(0);
